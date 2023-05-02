@@ -4,7 +4,7 @@ const db = require("../../config/db");
 exports.viewAllTodos = function viewAllTodos(res) {
   db.query("SELECT * FROM todo", (err, results) => {
     if (err) {
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ msg: "Internal server error" });
       return;
     }
     const updatedResults = { ...results[0] };
@@ -17,7 +17,7 @@ exports.viewAllTodos = function viewAllTodos(res) {
 exports.viewTodoById = function viewTodoById(res, id) {
   db.query("SELECT * FROM todo WHERE id = ?", [id], (err, results) => {
     if (err) {
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ msg: "Internal server error" });
       return;
     }
     if (results.length === 0) {
@@ -52,7 +52,7 @@ exports.createTodo = function createTodo(
     [title, description, due_time, user_id, status],
     (err, results) => {
       if (err) {
-        res.status(500).json({ error: "Internal server error" });
+        res.status(500).json({ msg: "Internal server error" });
         return;
       }
       const id = results.insertId;
@@ -62,7 +62,7 @@ exports.createTodo = function createTodo(
           [id],
           (err2, results2) => {
             if (err2) {
-              res.status(500).json({ error: "Internal server error" });
+              res.status(500).json({ msg: "Internal server error" });
               return;
             }
             if (results2.length === 0) {
@@ -105,7 +105,7 @@ exports.updateTodoById = function updateTodoById(
         [id],
         (err, results) => {
           if (err) {
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ msg: "Internal server error" });
             return;
           }
           if (results.length === 0) {
@@ -128,7 +128,7 @@ exports.updateTodoById = function updateTodoById(
 exports.deleteTodoById = function deleteTodoById(res, id) {
   db.execute("DELETE FROM todo WHERE id = ?", [id], (err, result) => {
     if (err) {
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ msg: "Internal server error" });
       return;
     }
     if (result.affectedRows === 0) {
