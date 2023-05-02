@@ -9,12 +9,7 @@ module.exports = function auth(app, bcrypt) {
     const { email, name, firstname } = req.body;
     let { password } = req.body;
 
-    if (
-      email === undefined ||
-      password === undefined ||
-      name === undefined ||
-      firstname === undefined
-    ) {
+    if (!email || !password || !name || !firstname) {
       res.status(400).json({ msg: "Bad parameter" });
       return;
     }
@@ -33,7 +28,7 @@ module.exports = function auth(app, bcrypt) {
   app.post("/login", (req, res) => {
     const { email, password } = req.body;
 
-    if (email === undefined || password === undefined) {
+    if (!email || !password) {
       res.status(400).json({ msg: "Bad parameter" });
       return;
     }
