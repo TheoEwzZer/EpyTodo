@@ -1,9 +1,10 @@
+/* eslint-disable camelcase */
 const db = require("../../config/db");
 
 exports.viewAllUsers = function viewAllUsers(res) {
   db.query("SELECT * FROM user", (err, results) => {
     if (err) {
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ msg: "Internal server error" });
       return;
     }
     const updatedResults = { ...results[0] };
@@ -16,25 +17,27 @@ exports.viewAllUsers = function viewAllUsers(res) {
   });
 };
 
-exports.viewAllUserTodos = function viewAllUserTodos(res, id) {
-  db.query("SELECT * FROM todo WHERE user_id = ?", [id], (err, results) => {
-    if (err) {
-      res.status(500).json({ error: "Internal server error" });
-      return;
+exports.viewAllUserTodos = function viewAllUserTodos(res, email) {
+  db.query(
+    "SELECT todo.id, title, description, due_time, user_id, status FROM `todo` INNER JOIN `user` ON todo.user_id = user.id WHERE user.email = ?",
+    [email],
+    (err, results) => {
+      if (err) {
+        res.status(500).json({ msg: "Internal server error" });
+        return;
+      }
+      const updatedResults = [];
+      for (let i = 0; i < results.length; i += 1) {
+        updatedResults[i] = results[i];
+        updatedResults[i].id = updatedResults[i].id.toString();
+        updatedResults[i].due_time = new Date(updatedResults[i].due_time)
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ");
+      }
+      res.status(200).json(updatedResults);
     }
-    if (results.length === 0) {
-      res.status(404).json({ msg: "Not found" });
-      return;
-    }
-    const updatedResults = { ...results[0] };
-    updatedResults.id = updatedResults.id.toString();
-    updatedResults.user_id = updatedResults.user_id.toString();
-    updatedResults.due_time = new Date(updatedResults.due_time)
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " ");
-    res.status(200).json(updatedResults);
-  });
+  );
 };
 
 exports.registerUser = function registerUser(
@@ -88,7 +91,7 @@ exports.viewUserIdByEmail = function viewUserIdByEmail(res, email) {
 exports.viewUserEmailById = function viewUserEmailById(res, id) {
   db.execute("SELECT * FROM `user` WHERE id = ?", [id], (err, results) => {
     if (err) {
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ msg: "Internal server error" });
       return;
     }
     if (results.length === 0) {
@@ -108,7 +111,7 @@ exports.viewUserEmailById = function viewUserEmailById(res, id) {
 exports.deleteUserById = function deleteUserById(res, id) {
   db.execute("DELETE FROM `user` WHERE id = ?", [id], (err, result) => {
     if (err) {
-      res.status(500).json({ error: "Internal server error" });
+      res.status(500).json({ msg: "Internal server error" });
       return;
     }
     if (result.affectedRows === 0) {
@@ -136,7 +139,7 @@ exports.updateUserById = function updateUserById(
         [id],
         (err, results) => {
           if (err) {
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ msg: "Internal server error" });
             return;
           }
           if (results.length === 0) {
@@ -186,7 +189,6 @@ exports.getMailAccount = function getMailAccount(
         if (!bcrypt.compareSync(password, password2)) {
           callback(84);
         } else {
-          res.json({ token: "Token of the newly logged in user" });
           callback(0);
         }
       } else {
