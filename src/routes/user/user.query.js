@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+const jwt = require("jsonwebtoken");
 const db = require("../../config/db");
 
 exports.viewAllUsers = function viewAllUsers(res) {
@@ -17,27 +18,23 @@ exports.viewAllUsers = function viewAllUsers(res) {
   });
 };
 
-exports.viewAllUserTodos = function viewAllUserTodos(res, email) {
-  db.query(
-    "SELECT todo.id, title, description, due_time, user_id, status FROM `todo` INNER JOIN `user` ON todo.user_id = user.id WHERE user.email = ?",
-    [email],
-    (err, results) => {
-      if (err) {
-        res.status(500).json({ msg: "Internal server error" });
-        return;
-      }
-      const updatedResults = [];
-      for (let i = 0; i < results.length; i += 1) {
-        updatedResults[i] = results[i];
-        updatedResults[i].id = updatedResults[i].id.toString();
-        updatedResults[i].due_time = new Date(updatedResults[i].due_time)
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ");
-      }
-      res.status(200).json(updatedResults);
+exports.viewAllUserTodos = function viewAllUserTodos(res, id) {
+  db.query("SELECT * FROM todo WHERE user_id = ?", [id], (err, results) => {
+    if (err) {
+      res.status(500).json({ msg: "Internal server error" });
+      return;
     }
-  );
+    const updatedResults = [];
+    for (let i = 0; i < results.length; i += 1) {
+      updatedResults[i] = results[i];
+      updatedResults[i].id = updatedResults[i].id.toString();
+      updatedResults[i].due_time = new Date(updatedResults[i].due_time)
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
+    }
+    res.status(200).json(updatedResults);
+  });
 };
 
 exports.registerUser = function registerUser(
@@ -57,7 +54,10 @@ exports.registerUser = function registerUser(
         });
         return;
       }
-      res.status(201).json({ token: "Token of the newly registered user" });
+      const token = jwt.sign({ email, password }, process.env.SECRET, {
+        expiresIn: "1h",
+      });
+      res.status(200).json({ token });
     }
   );
 };
@@ -185,10 +185,15 @@ exports.getMailAccount = function getMailAccount(
     [email],
     (err, results) => {
       if (results.length > 0) {
+        const id2 = results[0].id;
         const password2 = results[0].password;
         if (!bcrypt.compareSync(password, password2)) {
           callback(84);
         } else {
+          const token = jwt.sign({ email, id: id2 }, process.env.SECRET, {
+            expiresIn: "1h",
+          });
+          res.json({ token });
           callback(0);
         }
       } else {
