@@ -1,4 +1,3 @@
-const jwt = require("jsonwebtoken");
 const {
   registerUser,
   checkAccountMail,
@@ -41,11 +40,6 @@ module.exports = function auth(app, bcrypt) {
     getMailAccount(res, email, password, bcrypt, (callback) => {
       if (callback === 84) {
         res.status(401).json({ msg: "Invalid Credentials" });
-      } else {
-        const token = jwt.sign({ email }, process.env.SECRET, {
-          expiresIn: "1h",
-        });
-        res.status(200).json({ token });
       }
     });
   });
