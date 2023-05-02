@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const {
   viewAllUserTodos,
   viewAllUsers,
@@ -13,11 +14,21 @@ module.exports = function userRoutes(app, bcrypt) {
   });
 
   app.get("/user/todos", (req, res) => {
-    const { id } = req.params;
+    const { authorization } = req.headers;
 
-    // todo of login user
-
-    viewAllUserTodos(res, id);
+    const token = authorization && authorization.split(" ")[1];
+    if (token == null) {
+      res.status(401).json({ message: "No token, authorization denied" });
+      return;
+    }
+    jwt.verify(token, process.env.SECRET, (err, decoded) => {
+      if (err) {
+        res.status(403).json({ message: "Token is not valid" });
+        return;
+      }
+      const { email } = decoded;
+      viewAllUserTodos(res, email);
+    });
   });
 
   app.get("/users/:id", (req, res) => {
