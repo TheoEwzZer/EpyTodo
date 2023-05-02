@@ -1,0 +1,29 @@
+name: Epytodo
+
+on:
+  push:
+    branches-ignore:
+      - 'ga-ignore-*'
+  pull_request:
+    branches-ignore:
+      - 'ga-ignore-*'
+
+env:
+  MIRROR_URL: git@github.com:EpitechPromo2027/B-WEB-200-MAR-2-1-epytodo-theo.fabiano.git
+
+jobs:
+  push_to_mirror:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Push to mirror
+        uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: 
+            ${{ env.MIRROR_URL }}
+          ssh_private_key:
+            ${{ secrets.GIT_SSH_PRIVATE_KEY }}
