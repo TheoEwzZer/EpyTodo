@@ -3,67 +3,82 @@ const auth = require("../../middleware/auth");
 const {
   viewAllUserTodos,
   viewAllUsers,
-  viewUserEmailById,
-  viewUserIdByEmail,
+  viewUserByEmail,
+  viewUserById,
   updateUserById,
   deleteUserById,
 } = require("./user.query");
 
 module.exports = function userRoutes(app, bcrypt) {
   app.get("/user", auth, (req, res) => {
-    viewAllUsers(res);
+    try {
+      viewAllUsers(res);
+    } catch (error) {
+      res.status(500).json({ msg: "Internal server error" });
+    }
   });
 
   app.get("/user/todos", auth, (req, res) => {
-    const { id } = req;
-
-    viewAllUserTodos(res, id);
+    try {
+      const { id } = req;
+      viewAllUserTodos(res, id);
+    } catch (error) {
+      res.status(500).json({ msg: "Internal server error" });
+    }
   });
 
-  app.get("/users/:id", auth, (req, res) => {
-    const { id } = req.params;
-
-    if (parseInt(id, 10).toString() !== id) {
+  app.get("/users/:data", auth, (req, res) => {
+    try {
+      const { data } = req.params;
+      const emailRegex = /^\S+@\S+\.\S+$/;
+      if (parseInt(data, 10).toString() === data) {
+        viewUserById(res, data);
+        return;
+      }
+      if (emailRegex.test(data)) {
+        viewUserByEmail(res, data);
+        return;
+      }
       res.status(400).json({ msg: "Bad parameter" });
       return;
+    } catch (error) {
+      res.status(500).json({ msg: "Internal server error" });
     }
-    viewUserEmailById(res, id);
-  });
-
-  app.get("/users/:email", auth, (req, res) => {
-    const { email } = req.params;
-    if (email === undefined) {
-      res.status(400).json({ msg: "Bad parameter" });
-      return;
-    }
-    viewUserIdByEmail(res, email);
   });
 
   app.put("/users/:id", auth, (req, res) => {
-    const { id } = req.params;
-    const { email, name, firstname } = req.body;
-    let { password } = req.body;
-    if (
-      id === undefined ||
-      email === undefined ||
-      password === undefined ||
-      name === undefined ||
-      firstname === undefined ||
-      parseInt(id, 10).toString() !== id
-    ) {
-      res.status(400).json({ msg: "Bad parameter" });
-      return;
+    try {
+      const { id } = req.params;
+      const { email, name, firstname } = req.body;
+      let { password } = req.body;
+      if (
+        !id ||
+        !email ||
+        !password ||
+        !name ||
+        !firstname ||
+        parseInt(id, 10).toString() !== id
+      ) {
+        res.status(400).json({ msg: "Bad parameter" });
+        return;
+      }
+      password = bcrypt.hashSync(password, 10);
+      updateUserById(res, id, email, password, name, firstname);
+    } catch (error) {
+      res.status(500).json({ msg: "Internal server error" });
     }
-    password = bcrypt.hashSync(password, 10);
-    updateUserById(res, id, email, password, name, firstname);
   });
 
   app.delete("/users/:id", auth, (req, res) => {
-    const { id } = req.params;
-    if (parseInt(id, 10).toString() !== id) {
-      res.status(400).json({ msg: "Bad parameter" });
-      return;
+    try {
+      const { id } = req.params;
+      if (parseInt(id, 10).toString() !== id) {
+        res.status(400).json({ msg: "Bad parameter" });
+        return;
+      }
+      deleteUserById(res, id);
+    } catch (error) {
+      res.status(400).json({ msg: "Internal server error" });
     }
-    deleteUserById(res, id);
   });
 };

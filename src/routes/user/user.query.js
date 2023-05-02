@@ -62,15 +62,13 @@ exports.registerUser = function registerUser(
   );
 };
 
-exports.viewUserIdByEmail = function viewUserIdByEmail(res, email) {
+exports.viewUserByEmail = function viewUserIdByEmail(res, email) {
   db.execute(
     "SELECT * FROM `user` WHERE email = ?",
     [email],
     (err, results) => {
       if (err) {
-        res.status(500).json({
-          error: "Internal server error",
-        });
+        res.status(500).json({ error: "Internal server error" });
         return;
       }
       if (results.length === 0) {
@@ -88,7 +86,7 @@ exports.viewUserIdByEmail = function viewUserIdByEmail(res, email) {
   );
 };
 
-exports.viewUserEmailById = function viewUserEmailById(res, id) {
+exports.viewUserById = function viewUserEmailById(res, id) {
   db.execute("SELECT * FROM `user` WHERE id = ?", [id], (err, results) => {
     if (err) {
       res.status(500).json({ msg: "Internal server error" });
