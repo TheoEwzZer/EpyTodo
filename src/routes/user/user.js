@@ -1,4 +1,5 @@
-const jwt = require("jsonwebtoken");
+const auth = require("../../middleware/auth");
+
 const {
   viewAllUserTodos,
   viewAllUsers,
@@ -9,29 +10,17 @@ const {
 } = require("./user.query");
 
 module.exports = function userRoutes(app, bcrypt) {
-  app.get("/user", (req, res) => {
+  app.get("/user", auth, (req, res) => {
     viewAllUsers(res);
   });
 
-  app.get("/user/todos", (req, res) => {
-    const { authorization } = req.headers;
+  app.get("/user/todos", auth, (req, res) => {
+    const { id } = req;
 
-    const token = authorization && authorization.split(" ")[1];
-    if (token == null) {
-      res.status(401).json({ message: "No token, authorization denied" });
-      return;
-    }
-    jwt.verify(token, process.env.SECRET, (err, decoded) => {
-      if (err) {
-        res.status(403).json({ message: "Token is not valid" });
-        return;
-      }
-      const { email } = decoded;
-      viewAllUserTodos(res, email);
-    });
+    viewAllUserTodos(res, id);
   });
 
-  app.get("/users/:id", (req, res) => {
+  app.get("/users/:id", auth, (req, res) => {
     const { id } = req.params;
 
     if (parseInt(id, 10).toString() !== id) {
@@ -41,7 +30,7 @@ module.exports = function userRoutes(app, bcrypt) {
     viewUserEmailById(res, id);
   });
 
-  app.get("/users/:email", (req, res) => {
+  app.get("/users/:email", auth, (req, res) => {
     const { email } = req.params;
     if (email === undefined) {
       res.status(400).json({ msg: "Bad parameter" });
@@ -50,7 +39,7 @@ module.exports = function userRoutes(app, bcrypt) {
     viewUserIdByEmail(res, email);
   });
 
-  app.put("/users/:id", (req, res) => {
+  app.put("/users/:id", auth, (req, res) => {
     const { id } = req.params;
     const { email, name, firstname } = req.body;
     let { password } = req.body;
@@ -69,7 +58,7 @@ module.exports = function userRoutes(app, bcrypt) {
     updateUserById(res, id, email, password, name, firstname);
   });
 
-  app.delete("/users/:id", (req, res) => {
+  app.delete("/users/:id", auth, (req, res) => {
     const { id } = req.params;
     if (parseInt(id, 10).toString() !== id) {
       res.status(400).json({ msg: "Bad parameter" });

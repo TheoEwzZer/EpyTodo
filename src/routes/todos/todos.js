@@ -6,13 +6,15 @@ const {
   updateTodoById,
   deleteTodoById,
 } = require("./todos.query");
+const auth = require("../../middleware/auth");
+const notFound = require("../../middleware/notFound");
 
 module.exports = function todoRoutes(app) {
-  app.get("/todos", (req, res) => {
+  app.get("/todos", auth, (req, res) => {
     viewAllTodos(res);
   });
 
-  app.get("/todos/:id", (req, res) => {
+  app.get("/todos/:id", auth, notFound, (req, res) => {
     const { id } = req.params;
     if (parseInt(id, 10).toString() !== id) {
       res.status(400).json({ msg: "Bad parameter" });
@@ -21,7 +23,7 @@ module.exports = function todoRoutes(app) {
     viewTodoById(res, req.params.id);
   });
 
-  app.post("/todos", (req, res) => {
+  app.post("/todos", auth, (req, res) => {
     const { title, description, due_time, user_id, status } = req.body;
     if (
       title === undefined ||
@@ -36,7 +38,7 @@ module.exports = function todoRoutes(app) {
     createTodo(res, title, description, due_time, user_id, status);
   });
 
-  app.put("/todos/:id", (req, res) => {
+  app.put("/todos/:id", auth, (req, res) => {
     const { id } = req.params;
     const { title, description, due_time, status } = req.body;
     if (
@@ -53,7 +55,7 @@ module.exports = function todoRoutes(app) {
     updateTodoById(res, title, description, due_time, status, id);
   });
 
-  app.delete("/todos/:id", (req, res) => {
+  app.delete("/todos/:id", auth, (req, res) => {
     const { id } = req.params;
     if (parseInt(id, 10).toString() !== id) {
       res.status(400).json({ msg: "Bad parameter" });
