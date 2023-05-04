@@ -48,14 +48,7 @@ module.exports = function todoRoutes(app) {
     try {
       const { id } = req.params;
       const { title, description, due_time, status } = req.body;
-      if (
-        !id ||
-        !title ||
-        !description ||
-        !due_time ||
-        !status ||
-        parseInt(id, 10).toString() !== id
-      ) {
+      if (!id || !title || !description || !due_time || !status) {
         res.status(400).json({ msg: "Bad parameter" });
         return;
       }
