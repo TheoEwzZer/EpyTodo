@@ -131,7 +131,7 @@ of them are good and some are evil. For this project, you will only be authorize
 below. Every other package will be forbidden or needs to be authorized by the pedagogical team.
 
 - [Express](https://expressjs.com/)
-- [mysql](https://www.npmjs.com/package/mysql)
+- [mysql2](https://www.npmjs.com/package/mysql2)
 - [dotenv](https://www.npmjs.com/package/dotenv)
 - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 - [bcryptjs](https://www.npmjs.com/package/bcryptjs)
@@ -143,18 +143,18 @@ Here is a listing of all the routes we expect for this project.
 
 | route                | method | protected |         description       |
 | :------------------- | :----: | :-------: | :-----------------------: |
-| /register            | POST   | no        | register a new user       |
-| /login               | POST   | no        | connect a user            |
-| /user                | GET    | yes       | view all user information |
-| /user/todos          | GET    | yes       | view all user tasks       |
-| /users/:id or :email | GET    | yes       | view user information     |
-| /users/:id           | PUT    | yes       | update user information   |
-| /users/:id           | DELETE | yes       | delete user               |
-| /todos               | GET    | yes       | view all the todos        |
-| /todos/:id           | GET    | yes       | view the todo             |
-| /todos               | POST   | yes       | create a todo             |
-| /todos/:id           | PUT    | yes       | update a todo             |
-| /todos/:id           | DELETE | yes       | delete a todo             |
+| /register            |  POST  |    no     | register a new user       |
+| /login               |  POST  |    no     | connect a user            |
+| /user                |  GET   |    yes    | view all user information |
+| /user/todos          |  GET   |    yes    | view all user tasks       |
+| /users/:id or :email |  GET   |    yes    | view user information     |
+| /users/:id           |  PUT   |    yes    | update user information   |
+| /users/:id           | DELETE |    yes    | delete user               |
+| /todos               |  GET   |    yes    | view all the todos        |
+| /todos/:id           |  GET   |    yes    | view the todo             |
+| /todos               |  POST  |    yes    | create a todo             |
+| /todos/:id           |  PUT   |    yes    | update a todo             |
+| /todos/:id           | DELETE |    yes    | delete a todo             |
 
 In this project, we expect you to protect your route and only make them accessible to logged-in users. to
 do so, the protected routes should receive a valid JWT (JSON Web Token) in the header.
@@ -459,3 +459,15 @@ Request and response body:
 ```text
 Each response must use an appropriate HTTP.
 ```
+
+## FINAL MARK
+
+### Mark: 22 / 22 (100%)
+
+- Preliminaries (2 / 2)
+- Web Server (5 / 5)
+- Routes (does it exists) (3 / 3)
+- Routes (Is it well done) (3 / 3)
+- Password (1 / 1)
+- Token (3 / 3)
+- SQL DB (5 / 5)
